@@ -31,6 +31,9 @@ CreateThread(function()
         RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
             PlayerData.job = job
         end)
+        RegisterNetEvent('QBCore:Client:OnGangUpdate', function(gang)
+            PlayerData.gang = gang
+        end)
     end
 end)
 
@@ -86,14 +89,23 @@ AddEventHandler('wasabi_elevator:openMenu', function(data)
                 event = '',
                 --args = { elevator = elevator, floor = k }
             })
-        elseif v.groups then
-            local found
-            for i=1, #v.groups do
-                if PlayerData.job.name == v.groups[i] then
-                    found = true
+        elseif v.groups or v.gangs then
+            local foundGroup, foundGang
+            if v.groups then
+                for i=1, #v.groups do
+                    if PlayerData.job.name == v.groups[i] then
+                        foundGroup = true
+                    end
                 end
             end
-            if found then
+            if v.gangs then
+                for i=1, #v.gangs do
+                    if PlayerData.gang.name == v.gangs[i] then
+                        foundGang = true
+                    end
+                end
+            end
+            if foundGroup or foundGang then
                 table.insert(Options, {
                     title = v.title,
                     description = v.description,
@@ -107,34 +119,28 @@ AddEventHandler('wasabi_elevator:openMenu', function(data)
                     event = 'wasabi_elevator:noAccess'
                 })
             end
-        elseif not v.groups then
+        else
             table.insert(Options, {
                 title = v.title,
                 description = v.description,
                 event = 'wasabi_elevator:goToFloor',
                 args = { elevator = elevator, floor = k }
             })
-        else
-            table.insert(Options, {
-                title = v.title,
-                description = v.description,
-                event = 'wasabi_elevator:noAccess'
-            })
         end
     end
     lib.registerContext({
-		id = 'elevator_menu',
-		title = 'Elevator Menu',
-		options = Options
-	})
+        id = 'elevator_menu',
+        title = 'Elevator Menu',
+        options = Options
+    })
 
-	lib.showContext('elevator_menu')
+    lib.showContext('elevator_menu')
 end)
 
 CreateThread(function()
     for k,v in pairs(Config.Elevators) do
         for a,b in pairs(Config.Elevators[k]) do
-            if b.groups then
+            if b.groups or b.gangs then
                 exports[target]:AddBoxZone(k..':'..a, b.coords, b.target.width, b.target.length, {
                     name = k..':'..a,
                     heading = b.target.heading,
