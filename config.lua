@@ -21,6 +21,9 @@ Config.Elevators = {
                 'police',
                 'ambulance'
             },
+            gangs = {-- Gang locks yep
+                'ballas'
+            },
         },
         [2] = {
             coords = vec3(344.31, -586.12, 28.79), -- Coords, if you're new; last number is heading
